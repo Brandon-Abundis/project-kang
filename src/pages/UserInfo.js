@@ -1,4 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, {
+  //useEffect,
+  useState,
+} from "react";
 import { auth, db } from "../firebase/firebase";
 import { data } from "../data/data";
 //import { async } from "@firebase/util";
@@ -8,19 +11,23 @@ import { useNavigate } from "react-router-dom";
 function UserInfo() {
   const navigate = useNavigate();
 
-  const [uid, setUid] = useState("");
+  //const [uid, setUid] = useState("");
   const [notice, setNotice] = useState("");
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [userRank, setUserRank] = useState("");
   const [userOrg, setUserOrg] = useState("");
 
+  {
+    /*
   useEffect(() => {
     const user = auth.currentUser;
     if (user) {
       setUid(user.uid);
     }
   }, []);
+*/
+  }
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevent default browser behavior
@@ -32,7 +39,7 @@ function UserInfo() {
       // try to add a doc tp the firestore collection
       try {
         await addDoc(collection(db, "users"), {
-          uid: uid,
+          uid: auth.currentUser.uid,
           canGrade: false,
           firstName: firstName,
           lastName: lastName,
