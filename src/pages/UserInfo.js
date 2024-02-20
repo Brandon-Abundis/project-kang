@@ -1,61 +1,98 @@
-import React, { useState } from "react";
-import { auth } from "../firebase/firebase";
+import React, { useEffect, useState } from "react";
+import { auth, db } from "../firebase/firebase";
 import { data } from "../data/data";
+//import { async } from "@firebase/util";
+import { addDoc, collection } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 function UserInfo() {
-  //const [notice, setNotice] = useState("");
+  const navigate = useNavigate();
+
+  const [uid, setUid] = useState("");
+  const [notice, setNotice] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [userRank, setUserRank] = useState("");
   const [userOrg, setUserOrg] = useState("");
 
-  console.log(userRank);
-  if (userRank === "") {
-    console.log("rank is empty");
-  }
-  console.log(auth.currentUser.uid);
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (user) {
+      setUid(user.uid);
+    }
+  }, []);
 
-  /*
-  const data = {
-    rank: ["e-1", "e-2", "e-4", "e-5", "e-6", "e-7", "e-8", "e-9"],
-    organization: [
-      "spoc",
-      "ssc",
-      "starcom",
-      "sld 45",
-      "sld 30",
-      "spd 1",
-      "spd 2",
-      "delta 1",
-      "delta 2",
-      "delta 3",
-      "delta 4",
-      "delta 5",
-      "delta 6",
-      "delta 7",
-      "delta 9",
-      "delta 10",
-      "delat 11",
-      "delta 12",
-      "delta 13",
-      "delta 14",
-      "delta 15",
-      "delta 16",
-      "delta 17",
-      "delta 18",
-    ],
+  const handleSubmit = async (event) => {
+    event.preventDefault(); // Prevent default browser behavior
+
+    // Check if input fields are valid
+    if (!firstName || !lastName || !userRank || !userOrg) {
+      setNotice("Please fill in all the fields.");
+    } else {
+      // try to add a doc tp the firestore collection
+      try {
+        await addDoc(collection(db, "users"), {
+          uid: uid,
+          canGrade: false,
+          firstName: firstName,
+          lastName: lastName,
+          userRank: userRank,
+          userOrg: userOrg,
+        });
+
+        // clear input fields
+        setFirstName("");
+        setLastName("");
+        setUserRank("");
+        setUserOrg("");
+
+        //alert("Data sent successfully");
+        navigate("/profile");
+      } catch (error) {
+        console.error(error);
+      }
+    }
   };
-  */
+
+  // requires name field for jsx
+  // Handles input changes by using a switch case to scale later
+  const handleChange = async (event) => {
+    // Get the name and value of ech input field
+    const { name, value } = event.target;
+
+    // Update the state variable corresponding to the input field
+    switch (name) {
+      case "firstName":
+        setFirstName(value);
+        break;
+
+      case "lastName":
+        setLastName(value);
+        break;
+
+      case "userRank":
+        setUserRank(value);
+        break;
+
+      case "userOrg":
+        setUserOrg(value);
+        break;
+
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="container">
       <div className="row justify-content-center">
-        <form className="col-md-4 mt-3 pt-3 pb-3">
-          {/*
+        <form onSubmit={handleSubmit} className="col-md-4 mt-3 pt-3 pb-3">
           {"" !== notice && (
             <div className="alert alert-warning" role="alert">
               {notice}
             </div>
           )}
-          */}
+
           <div className="col-md-4 text-center">
             <p className="lead">Information</p>
           </div>
@@ -63,31 +100,36 @@ function UserInfo() {
           <div className="form-floating mb-3">
             <input
               id="name"
+              name="firstName"
               type="text"
-              className="form-control"
-              placeholder="Min"
+              className={"form-control"}
+              value={firstName}
+              onChange={handleChange}
             ></input>
             <label htmlFor="firstname" className="form-label">
-              First Name
+              First name:
             </label>
           </div>
 
           <div className="form-floating mb-3">
             <input
               id="lastname"
+              name="lastName"
               type="text"
-              className="form-control"
-              placeholder="Kang"
+              className={"form-control"}
+              value={lastName}
+              onChange={handleChange}
             ></input>
             <label htmlFor="lastname" className="form-label">
-              Last Name
+              Last name:
             </label>
           </div>
 
           <div className="form-floating mb-3">
             <select
-              id="userRank"
-              className={`form-select ${userRank === "" ? "is-invalid" : ""}`}
+              id="userrank"
+              name="userRank"
+              className={"form-select"}
               value={userRank}
               onChange={(e) => setUserRank(e.target.value)}
             >
@@ -99,24 +141,31 @@ function UserInfo() {
               ))}
             </select>
             <label htmlFor="userRank" className="form-label">
-              Select Rank:
+              Rank:
             </label>
           </div>
 
           <div className="form-floating mb-3">
             <select
-              className="form-select"
+              id="userOrg"
+              name="userOrg"
+              className={"form-select"}
               value={userOrg}
-              onChange={(e) => setUserOrg(e.target.value)}
+              onChange={handleChange}
             >
+              <option value="" disabled hidden></option>
               {data._organization.map((option) => (
                 <option key={option.name}>{option.name}</option>
               ))}
             </select>
             <label htmlFor="userOrg" className="form-label">
-              Select Organization:
+              Field Command or Delta:
             </label>
           </div>
+
+          <button type="submit" className="btn btn-primary">
+            Send Data
+          </button>
         </form>
       </div>
     </div>
