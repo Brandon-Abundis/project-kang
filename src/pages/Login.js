@@ -21,7 +21,7 @@ function Login() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("./home");
+      navigate("./site/home");
     } catch {
       setNotice("You entered a wrong username or password.");
     }

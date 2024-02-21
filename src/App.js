@@ -4,6 +4,7 @@ import Signup from "./pages/Signup";
 import Profile from "./pages/Profile";
 import UserInfo from "./pages/UserInfo";
 import Home from "./pages/Home";
+import NavLayout from "./pages/NavLayout";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import React from "react";
 
@@ -17,8 +18,10 @@ function App() {
           <Route index element={<Login></Login>}></Route>
           <Route path="/signup" element={<Signup></Signup>}></Route>
           <Route path="/userinfo" element={<UserInfo></UserInfo>}></Route>
-          <Route path="/profile" element={<Profile></Profile>}></Route>
-          <Route path="/home" element={<Home></Home>}></Route>
+        </Route>
+        <Route path="/site" element={<NavLayout></NavLayout>}>
+          <Route path="/site/home" element={<Home></Home>}></Route>
+          <Route path="/site/profile" element={<Profile></Profile>}></Route>
         </Route>
       </Routes>
     </BrowserRouter>
