@@ -8,11 +8,14 @@
     "@testing-library/user-event": "^13.5.0",
     "bootstrap": "^5.3.3",
     "firebase": "^10.7.2",
+    "prop-types": "^15.8.1",
     "react": "^18.2.0",
     "react-bootstrap": "^2.10.1",
     "react-dom": "^18.2.0",
+    "react-pdf": "^7.7.1",
     "react-router-dom": "^6.21.3",
     "react-scripts": "5.0.1",
+    "uuid": "^9.0.1",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
@@ -40,6 +43,8 @@
     ]
   },
   "devDependencies": {
+    "@babel/core": "^7.23.9",
+    "@babel/preset-react": "^7.23.3",
     "eslint": "^8.56.0",
     "eslint-plugin-react": "^7.33.2"
   }

@@ -1,37 +1,47 @@
-import React from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { db } from "../firebase/firebase";
+import { doc, getDoc } from "firebase/firestore";
 import { auth } from "../firebase/firebase";
-import { signOut } from "firebase/auth";
+import PDFUploader from "./PDFUploader";
 
 function Profile() {
-  const navigate = useNavigate();
-  const user = auth.currentUser;
+  const [pdfUrl, setPdfUrl] = useState(null);
+  const [refresh, setRefresh] = useState(false); // State to trigger refresh
 
-  const logoutUser = async (e) => {
-    e.preventDefault();
+  useEffect(() => {
+    const fetchDocument = async () => {
+      const docRef = doc(db, "users", auth.currentUser.uid);
+      const docSnap = await getDoc(docRef);
 
-    await signOut(auth);
-    navigate("/");
+      if (docSnap.exists()) {
+        console.log("Document data:", docSnap.data());
+        setPdfUrl(docSnap.data().pdf);
+      } else {
+        console.error("No such document!");
+      }
+    };
+
+    fetchDocument();
+  }, [refresh]); // Depend on the refresh state
+
+  const handleUploadSuccess = () => {
+    setRefresh(!refresh); // Toggle the refresh state to trigger re-fetching the document
   };
 
   return (
     <div className="container">
-      <div className="row justify-content-center">
-        <div className="col-md-4 text-center">
-          <p>
-            Welcome <em className="text-decoration-underline">{user.email}</em>.
-            You are logged in!
-          </p>
-          <div className="d-grid gap-2">
-            <button
-              type="submit"
-              className="btn btn-primary pt-3 pb-3"
-              onClick={(e) => logoutUser(e)}
-            >
-              Logout
-            </button>
-          </div>
-        </div>
+      <PDFUploader onUploadSuccess={handleUploadSuccess} />
+      <div>
+        {pdfUrl ? (
+          <iframe
+            src={pdfUrl}
+            width="100%"
+            height="600px"
+            style={{ border: "none" }}
+          ></iframe>
+        ) : (
+          <p>No PDF found</p>
+        )}
       </div>
     </div>
   );

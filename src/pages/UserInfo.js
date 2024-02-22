@@ -5,7 +5,7 @@ import React, {
 import { auth, db } from "../firebase/firebase";
 import { data } from "../data/data";
 //import { async } from "@firebase/util";
-import { addDoc, collection } from "firebase/firestore";
+import { setDoc, doc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 
 function UserInfo() {
@@ -38,7 +38,7 @@ function UserInfo() {
     } else {
       // try to add a doc tp the firestore collection
       try {
-        await addDoc(collection(db, "users"), {
+        await setDoc(doc(db, "users", auth.currentUser.uid), {
           uid: auth.currentUser.uid,
           canGrade: false,
           firstName: firstName,
@@ -54,7 +54,7 @@ function UserInfo() {
         setUserOrg("");
 
         //alert("Data sent successfully");
-        navigate("/profile");
+        navigate("/site/home");
       } catch (error) {
         console.error(error);
       }
